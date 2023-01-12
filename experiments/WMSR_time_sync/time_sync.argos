@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="16" />
+    <experiment length="0"
+                ticks_per_second="30"
+                random_seed="124" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <footbot_time_sync_WMSR_controller id="fbWMSRc"
+                                 library="build/controllers/footbot_time_sync_WMSR/libfootbot_time_sync_WMSR">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="250" />
+        <flocking target_distance="125"
+                  gain="2000"
+                  exponent="2" />
+        <resilient_time_sync F="45"
+                  byzantine="false"
+                  observer="false" />
+      </params>
+    </footbot_time_sync_WMSR_controller>
+
+    <footbot_time_sync_WMSR_controller id="fbWMSRobsc"
+                                 library="build/controllers/footbot_time_sync_WMSR/libfootbot_time_sync_WMSR">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="250" />
+        <flocking target_distance="125"
+                  gain="2000"
+                  exponent="2" />
+        <resilient_time_sync F="45"
+                  byzantine="false"
+                  observer="true"
+                  observation_period="100"/>
+      </params>
+    </footbot_time_sync_WMSR_controller>
+
+    <footbot_time_sync_WMSR_controller id="fbWMSRbyzc"
+                                 library="build/controllers/footbot_time_sync_WMSR/libfootbot_time_sync_WMSR">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="250" />
+        <flocking target_distance="125"
+                  gain="2000"
+                  exponent="2" />
+        <resilient_time_sync F="45"
+                  byzantine="true"
+                  byzantine_offset="10"
+                  observation_period="400"
+                  observer="false" />
+      </params>
+    </footbot_time_sync_WMSR_controller>
+    
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="50,50,1" center="0,0,0.5">
+
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="100" max_trials="100">
+        <foot-bot-networked id="fb" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="fbWMSRc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="50" max_trials="100">
+        <foot-bot-networked id="obs" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="fbWMSRobsc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="45" max_trials="100">
+        <foot-bot-networked id="byz" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="fbWMSRbyzc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+
+  </arena>
+
+  <loop_functions library="build/loop_functions/byzantine_time_sync_loop_functions/libbyzantine_time_sync_loop_functions"
+                label="byzantine_time_sync_loop_functions" 
+                simulation_time="1000"
+                controller_type="WMSR"
+                tracking_error_output="experiments/WMSR_time_sync/time_sync.argos.tracking_error"
+                blocklist_stats_output="experiments/WMSR_time_sync/time_sync.argos.blocklist_stats"/>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d"/>
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <led id="leds" />
+    <simple_radio id="radios" />
+  </media>
+
+  <!-- ******************
+  * Visualization *
+  ****************** -->
+  <visualization>
+    <qt-opengl>
+      <!-- <user_functions library="build/loop_functions/id_loop_functions/libid_loop_functions"
+                      label="id_qtuser_functions" /> -->
+      <camera>
+        <placements>
+          <placement index="0" position="0,-25,12" look_at="0,0,0.5"  lens_focal_length="20" />
+        </placements>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

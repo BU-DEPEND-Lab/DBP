@@ -1,0 +1,5 @@
+add_library(footbot_flocking_byzantine MODULE footbot_flocking_byzantine.h footbot_flocking_byzantine.cpp)
+target_link_libraries(footbot_flocking_byzantine
+  argos3core_simulator
+  argos3plugin_simulator_footbotnetworked
+  argos3plugin_simulator_genericrobot)

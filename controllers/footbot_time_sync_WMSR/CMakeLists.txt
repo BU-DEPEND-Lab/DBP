@@ -1,0 +1,7 @@
+add_library(footbot_time_sync_WMSR MODULE
+  footbot_time_sync_WMSR.h
+  footbot_time_sync_WMSR.cpp)
+target_link_libraries(footbot_time_sync_WMSR
+  argos3core_simulator
+  argos3plugin_simulator_footbotnetworked
+  argos3plugin_simulator_genericrobot)

@@ -1,0 +1,158 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="16" />
+    <experiment length="0"
+                ticks_per_second="30"
+                random_seed="124" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    <footbot_flocking_OSP_IC_controller id="ffOSPICc"
+                                 library="build/controllers/footbot_flocking_OSP_IC/libfootbot_flocking_OSP_IC">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="250" />
+        <flocking target_distance="125"
+                  gain="2000"
+                  exponent="2" />
+        <observation_sharing max_hop_count="4"
+                  max_target_displacement="0.5"
+                  outbound_obs_limit="2" />
+      </params>
+    </footbot_flocking_OSP_IC_controller>
+
+    <footbot_flocking_OSP_byzantine_controller id="ffOSPbc"
+                                 library="build/controllers/footbot_flocking_OSP_byzantine/libfootbot_flocking_OSP_byzantine">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="150" />
+        <flocking target_distance="125"
+                  gain="2000"
+                  exponent="2" />
+        <byzantine_target x="0" y="0" />
+      </params>
+    </footbot_flocking_OSP_byzantine_controller>
+
+    <footbot_target_controller id="ftc"
+                                 library="build/controllers/footbot_target/libfootbot_target">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="true" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+            max_speed="0.0" />
+      </params>
+    </footbot_target_controller>
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="50,50,1" center="0,0,0.5">
+
+    <foot-bot id="target" omnidirectional_camera_aperture="72">
+      <body position="3,3,0" orientation="0,0,0" />
+      <controller config="ftc" />
+    </foot-bot>
+    
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="100" max_trials="100">
+        <foot-bot-networked id="fb" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="ffOSPICc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="30" max_trials="100">
+        <foot-bot-networked id="byz" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="ffOSPbc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+
+  </arena>
+
+  <loop_functions library="build/loop_functions/byzantine_flocking_loop_functions/libbyzantine_flocking_loop_functions"
+                label="byzantine_flocking_loop_functions" 
+                simulation_time="2000"
+                tracking_error_output="experiments/DBP/flocking_positive-obs-fixed.argos.tracking_error"
+                blocklist_stats_output="experiments/DBP/flocking_positive-obs-fixed.argos.blocklist_stats"/>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d"/>
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <led id="leds" />
+    <simple_radio id="radios" />
+  </media>
+
+  <!-- ******************
+  * Visualization *
+  ****************** -->
+  <visualization>
+    <qt-opengl>
+      <!-- <user_functions library="build/loop_functions/id_loop_functions/libid_loop_functions" -->
+      <!--                 label="id_qtuser_functions" /> -->
+      <camera>
+        <placements>
+          <placement index="0" position="0,-25,12" look_at="0,0,0.5"  lens_focal_length="20" />
+        </placements>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

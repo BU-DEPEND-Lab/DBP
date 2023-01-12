@@ -1,0 +1,12 @@
+include_directories(${CMAKE_SOURCE_DIR})
+
+# If Qt+OpenGL dependencies were found, descend into these directories
+if(ARGOS_QTOPENGL_FOUND)
+  add_subdirectory(flocking_loop_functions)
+endif(ARGOS_QTOPENGL_FOUND)
+
+add_subdirectory(byzantine_flocking_loop_functions)
+add_subdirectory(byzantine_flocking_WMSR_loop_functions)
+add_subdirectory(byzantine_time_sync_loop_functions)
+add_subdirectory(byzantine_localization_loop_functions)
+add_subdirectory(id_loop_functions)

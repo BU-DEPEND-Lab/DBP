@@ -1,0 +1,12 @@
+include_directories(${CMAKE_SOURCE_DIR}/controllers)
+
+add_subdirectory(utility)
+add_subdirectory(footbot_flocking)
+add_subdirectory(footbot_flocking_WMSR)
+add_subdirectory(footbot_flocking_byzantine)
+add_subdirectory(footbot_flocking_OSP_IC)
+add_subdirectory(footbot_flocking_OSP_byzantine)
+add_subdirectory(footbot_time_sync_OSP)
+add_subdirectory(footbot_time_sync_WMSR)
+add_subdirectory(footbot_localization_OSP)
+add_subdirectory(footbot_target)

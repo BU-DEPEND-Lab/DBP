@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="16" />
+    <experiment length="0"
+                ticks_per_second="30"
+                random_seed="124" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <footbot_flocking_controller id="ffc"
+                                 library="build/controllers/footbot_flocking/libfootbot_flocking">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="350" />
+        <flocking target_distance="150"
+                  gain="2000"
+                  exponent="2" />
+      </params>
+    </footbot_flocking_controller>
+
+    <footbot_flocking_WMSR_controller id="ffWMSRc"
+                                 library="build/controllers/footbot_flocking_WMSR/libfootbot_flocking_WMSR">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="350" />
+        <flocking target_distance="150"
+                  gain="2000"
+                  exponent="2" />
+        <resilient_flocking F="15" />
+      </params>
+    </footbot_flocking_WMSR_controller>
+
+    <footbot_flocking_byzantine_controller id="ffbc"
+                                 library="build/controllers/footbot_flocking_byzantine/libfootbot_flocking_byzantine">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <simple_radios         implementation="default" medium="radios" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="false" />
+        <simple_radios                       implementation="default" medium="radios" show_rays="false" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="150" />
+        <flocking target_distance="150"
+                  gain="2000"
+                  exponent="2" />
+        <byzantine_target x="-6" y="-6" />
+      </params>
+    </footbot_flocking_byzantine_controller>
+
+
+    <footbot_target_controller id="ftc"
+                                 library="build/controllers/footbot_target/libfootbot_target">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+      </actuators>
+      <sensors>
+        <positioning implementation="default" />
+        <footbot_light                       implementation="rot_z_only" show_rays="false" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only" medium="leds" show_rays="true" />
+      </sensors>
+      <params>
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="10"
+                       max_speed="60" />
+      </params>
+    </footbot_target_controller>
+
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="50,50,1" center="0,0,0.5">
+
+    <foot-bot id="target" omnidirectional_camera_aperture="72">
+      <body position="3,3,0" orientation="0,0,0" />
+      <controller config="ftc" />
+    </foot-bot>
+    
+    <distribute>
+      <position method="uniform" min="-3,-3,0" max="4,4,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="200" max_trials="100">
+        <foot-bot-networked id="fb" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="ffWMSRc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+
+    <distribute>
+      <position method="uniform" min="-5,-5,0" max="5,5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="100" max_trials="100">
+        <foot-bot-networked id="byz" omnidirectional_camera_aperture="72" radio_medium="radios" transmission_range="4">
+          <controller config="ffbc" />
+        </foot-bot-networked>
+      </entity>
+    </distribute>
+
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d"/>
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <led id="leds" />
+    <simple_radio id="radios" />
+  </media>
+
+  <loop_functions library="build/loop_functions/byzantine_flocking_WMSR_loop_functions/libbyzantine_flocking_WMSR_loop_functions"
+              label="byzantine_flocking_WMSR_loop_functions" 
+              simulation_time="2000"
+              tracking_error_output="experiments/WMSR_flocking/flocking_WMSR_smallF.argos.tracking_error"/>
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qt-opengl>
+      <!-- <user_functions library="build/loop_functions/id_loop_functions/libid_loop_functions"
+                      label="id_qtuser_functions" /> -->
+      <camera>
+        <placements>
+          <placement index="0" position="0,-25,12" look_at="0,0,0.5"  lens_focal_length="20" />
+        </placements>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

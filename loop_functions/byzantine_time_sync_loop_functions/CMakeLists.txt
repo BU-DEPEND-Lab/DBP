@@ -1,0 +1,9 @@
+add_library(byzantine_time_sync_loop_functions MODULE
+  byzantine_time_sync_loop_functions.h
+  byzantine_time_sync_loop_functions.cpp)
+
+target_link_libraries(byzantine_time_sync_loop_functions
+  argos3core_simulator
+  argos3plugin_simulator_entities
+  argos3plugin_simulator_footbot
+  argos3plugin_simulator_footbotnetworked)

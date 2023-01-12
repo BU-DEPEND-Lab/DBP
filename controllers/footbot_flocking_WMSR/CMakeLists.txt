@@ -1,0 +1,5 @@
+add_library(footbot_flocking_WMSR MODULE footbot_flocking_WMSR.h footbot_flocking_WMSR.cpp)
+target_link_libraries(footbot_flocking_WMSR
+  argos3core_simulator
+  argos3plugin_simulator_footbotnetworked
+  argos3plugin_simulator_genericrobot)
